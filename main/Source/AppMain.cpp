@@ -3,30 +3,52 @@
 #include "freertos/task.h"
 #include "esp_system.h"
 #include "esp_spi_flash.h"
+#include "ZAssert.hpp"
+#include "Dispatcher.hpp"
+#include "NetworkStore.hpp"
+#include "TaskRegistry.hpp"
+#include "esp_log.h"
+#include "mdns.h"
+#include "nvs_flash.h"
+//==============================================================================
+// Private defines and constants
+//==============================================================================
+//==============================================================================
+// Private typedefs
+//==============================================================================
+class SingletonInitializer
+{
+public:
+    SingletonInitializer()
+    {
+        ESP_LOGI("Singleton", "Initialize singletons!");
+        NetworkStore::CreateMutex();
+        Dispatcher::CreateMutex();
+        TaskRegistry::CreateMutex();
+    }
+};
 
+//==============================================================================
+// Private variables
+//==============================================================================
+// ESP guarantees that this constructor is called before the scheduler starts.
+static SingletonInitializer singletonInitializer;
+//==============================================================================
+// Private function definitions
+//==============================================================================
 
+//==============================================================================
+// Public function definitions
 extern "C" void app_main()
 {
     printf("Hello zach!\n");
 
-    /* Print chip information */
-    esp_chip_info_t chip_info;
-    esp_chip_info(&chip_info);
-    printf("This is ESP32 chip with %d CPU cores, WiFi%s%s, ",
-            chip_info.cores,
-            (chip_info.features & CHIP_FEATURE_BT) ? "/BT" : "",
-            (chip_info.features & CHIP_FEATURE_BLE) ? "/BLE" : "");
-
-    printf("silicon revision %d, ", chip_info.revision);
-
-    printf("%dMB %s flash\n", spi_flash_get_chip_size() / (1024 * 1024),
-            (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded" : "external");
-
-    for (int i = 10; i >= 0; i--) {
-        printf("Restarting in %d seconds...\n", i);
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    Dispatcher::GetInstance().Subscribe(NetworkStore::GetInstance());
+    TaskRegistry::GetInstance().StartTasks();
+    for (;;)
+    {
+        ESP_LOGE("Heap", "%u", esp_get_free_heap_size());
+        ESP_LOGE("HeapMin", "%u", esp_get_minimum_free_heap_size());
+        vTaskDelay(pdMS_TO_TICKS(1000));
     }
-    printf("Restarting now.\n");
-    fflush(stdout);
-    esp_restart();
 }

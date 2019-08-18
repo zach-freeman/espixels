@@ -1,2 +1,8 @@
-idf_component_register(SRCS "Source/AppMain.cpp"
-                    INCLUDE_DIRS "Include")
+idf_component_register(SRCS "Source/AppMain.cpp" 
+                            "Source/Action.cpp" 
+                            "Source/Dispatcher.cpp" 
+                            "Source/TaskRegistry.cpp"
+                            "Source/NetworkAction.cpp"  
+                            "Source/NetworkStore.cpp"
+                    INCLUDE_DIRS "Include"
+                                 "../esp-idf/components/freertos/include/freertos")
