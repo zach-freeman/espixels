@@ -35,13 +35,6 @@ void NetworkAction::Accept(Store &store)
     store.ProcessAction(*this);
 }
 
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void NetworkAction::SetActionType(NetworkActionType action)
-{
-    mActionType = action;
-}
 
 //------------------------------------------------------------------------------
 //
@@ -95,14 +88,6 @@ void NetworkAction::SetData(uint8_t *ptr, uint32_t size, ServerType type, uint32
     SetActionType(NetworkAction::NetworkActionType::AcessPointList);
     memcpy(&mAccessPointList, &list, sizeof(list));
 }*/
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-NetworkAction::NetworkActionType NetworkAction::GetActionType() const
-{
-    return mActionType;
-}
 
 //------------------------------------------------------------------------------
 //

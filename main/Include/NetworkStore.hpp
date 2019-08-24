@@ -2,7 +2,6 @@
 #define NETWORK_STORE_HPP
 
 #include <stdint.h>
-#include "Singleton.hpp"
 #include "Store.hpp"
 
 //==============================================================================
@@ -21,15 +20,15 @@
 // Public function prototypes
 //==============================================================================
 
-class NetworkStore : public Store, public Singleton<NetworkStore>
+class NetworkStore : public Store
 {
 public:
-    friend Singleton<NetworkStore>;
-    void ProcessAction(NetworkAction &action) override;
-    virtual ~NetworkStore() = default;
-private:
     NetworkStore();
-    static NetworkStore * mInstance;
+    virtual ~NetworkStore() = default;
+    void ProcessAction(NetworkAction &action) override;
+
+private:
+
 };
 
 #endif    // NETWORK_STORE_HPP

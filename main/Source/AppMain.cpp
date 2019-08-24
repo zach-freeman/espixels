@@ -4,8 +4,11 @@
 #include "esp_system.h"
 #include "esp_spi_flash.h"
 #include "ZAssert.hpp"
+#include "NetworkAction.hpp"
 #include "Dispatcher.hpp"
 #include "NetworkStore.hpp"
+#include "PrivateInfo.h"
+#include "StoreProvider.hpp"
 #include "TaskRegistry.hpp"
 #include "esp_log.h"
 #include "mdns.h"
@@ -22,7 +25,7 @@ public:
     SingletonInitializer()
     {
         ESP_LOGI("Singleton", "Initialize singletons!");
-        NetworkStore::CreateMutex();
+        StoreProvider::CreateMutex();
         Dispatcher::CreateMutex();
         TaskRegistry::CreateMutex();
     }
@@ -42,9 +45,16 @@ static SingletonInitializer singletonInitializer;
 extern "C" void app_main()
 {
     printf("Hello zach!\n");
-
-    Dispatcher::GetInstance().Subscribe(NetworkStore::GetInstance());
+    NetworkStore &networkStore{*(new NetworkStore())};
+    Dispatcher::GetInstance().Subscribe(networkStore);
+    StoreProvider::GetInstance().SetNetworkStore(networkStore);
     TaskRegistry::GetInstance().StartTasks();
+    NetworkAction networkAction = NetworkAction(NetworkActionType::ClientConnect);
+    uint8_t *ssid = PrivateInfo::GetSsid();
+    networkAction.SetSsid(ssid, sizeof(ssid));
+    uint8_t *passphrase = PrivateInfo::GetPassphrase();
+    networkAction.SetPassphrase(passphrase, sizeof(passphrase));
+    Dispatcher::GetInstance().SendAction(networkAction);
     for (;;)
     {
         ESP_LOGE("Heap", "%u", esp_get_free_heap_size());

@@ -8,6 +8,7 @@
 #include <memory>
 
 #include "Action.hpp"
+#include "ActionType.hpp"
 //==============================================================================
 // Public defines and constants
 //==============================================================================
@@ -15,7 +16,23 @@
 //==============================================================================
 // Public typedefs
 //==============================================================================
-
+enum class NetworkActionType
+{
+    None,
+    WifiConnected,
+    WifiDisconnected,
+    Server,
+    Data,
+    Provision,
+    ClientConnect,
+    ClientDisconnect,
+    AcessPointList,
+    CloudRegistration,
+    CloudConnect,
+    RegistrationResult,
+    CloudDisconnected,
+    GotIP
+};
 //==============================================================================
 // Public variables
 //==============================================================================
@@ -23,7 +40,7 @@
 //==============================================================================
 // Public function prototypes
 //==============================================================================
-class NetworkAction : public Action
+class NetworkAction : public Action, public ActionType<NetworkActionType>
 {
 public:
     typedef struct
@@ -47,27 +64,9 @@ public:
         uint8_t *  Data;
     } Data_t;
 
-    enum class NetworkActionType
-    {
-        None,
-        WifiConnected,
-        WifiDisconnected,
-        Server,
-        Data,
-        Provision,
-        ClientConnect,
-        ClientDisconnect,
-        AcessPointList,
-        CloudRegistration,
-        CloudConnect,
-        RegistrationResult,
-        CloudDisconnected,
-        GotIP
-    };
 
     NetworkAction(NetworkActionType action) : mActionType(action){};
     //void     SetAccessPointList(ApList *list);
-    void     SetActionType(NetworkActionType action);
     void     SetServerInfo(ServerInfo_t &);
     void     SetSsid(uint8_t *, size_t size);
     void     SetPassphrase(uint8_t *, size_t size);
@@ -81,7 +80,6 @@ public:
     char *   GetUrl();
     void     SetIpAddress(uint32_t);
     uint32_t GetIpAddress();
-    NetworkActionType   GetActionType() const;
     void                Accept(Store &) override;
     const ServerInfo_t &GetServerInfo() const;
     const uint8_t *     GetSsid() const;
