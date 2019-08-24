@@ -65,7 +65,7 @@ public:
     } Data_t;
 
 
-    NetworkAction(NetworkActionType action) : mActionType(action){};
+    NetworkAction(NetworkActionType action) : mActionType(action){ AddType(mActionType); };
     //void     SetAccessPointList(ApList *list);
     void     SetServerInfo(ServerInfo_t &);
     void     SetSsid(uint8_t *, size_t size);
