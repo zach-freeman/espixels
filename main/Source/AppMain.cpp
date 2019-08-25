@@ -45,6 +45,7 @@ static SingletonInitializer singletonInitializer;
 extern "C" void app_main()
 {
     printf("Hello zach!\n");
+    nvs_flash_init();
     NetworkStore &networkStore{*(new NetworkStore())};
     Dispatcher::GetInstance().Subscribe(networkStore);
     StoreProvider::GetInstance().SetNetworkStore(networkStore);
@@ -56,7 +57,7 @@ extern "C" void app_main()
     uint8_t *passphrase = PrivateInfo::GetPassphrase();
     networkAction.SetPassphrase(passphrase, sizeof(passphrase));
     Dispatcher::GetInstance().SendAction(networkAction);
-    
+
     for (;;)
     {
         ESP_LOGE("Heap", "%u", esp_get_free_heap_size());

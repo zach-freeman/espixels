@@ -1,9 +1,9 @@
-#ifndef NETWORK_STORE_HPP
-#define NETWORK_STORE_HPP
+//==============================================================================
+// Copyright © 2019 Sparkwing
+//==============================================================================
+#ifndef WIFI_INCLUDED
+#define WIFI_INCLUDED
 
-#include <stdint.h>
-#include "Store.hpp"
-#include "EspWifi.hpp"
 
 //==============================================================================
 // Public defines and constants
@@ -20,17 +20,20 @@
 //==============================================================================
 // Public function prototypes
 //==============================================================================
-
-class NetworkStore : public Store
+// TODO: add this backwhen esp supports gcc8
+// class Wifi :  public WifiEventInterface
+class Wifi
 {
 public:
-    NetworkStore();
-    virtual ~NetworkStore() = default;
-    void ProcessAction(NetworkAction &action) override;
-
-private:
-    EspWifi mWifi;
-
+    enum class WifiMode
+    {
+        Station,
+        AccessPoint
+    };
+    virtual void SetSsid(const char *ssid)         = 0;
+    virtual void SetPassword(const char *password) = 0;
+    virtual void SetMode(WifiMode mode)            = 0;
+    virtual void Start()                           = 0;
+    virtual void Stop()                            = 0;
 };
-
-#endif    // NETWORK_STORE_HPP
+#endif    // WIFI_INCLUDED

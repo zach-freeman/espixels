@@ -1,6 +1,7 @@
 idf_component_register(SRCS "Source/AppMain.cpp" 
                             "Source/Action.cpp" 
                             "Source/Dispatcher.cpp" 
+                            "Source/EspWifi.cpp"
                             "Source/TaskRegistry.cpp"
                             "Source/NetworkAction.cpp"  
                             "Source/NetworkStore.cpp"
