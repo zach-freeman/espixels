@@ -9,6 +9,7 @@
 #include <memory>
 
 #include "NetworkAction.hpp"
+#include "TimeAction.hpp"
 //==============================================================================
 // Public defines and constants
 //==============================================================================
@@ -30,12 +31,12 @@ class StoreSubscriber
 public:
     enum class ChangeType
     {
-        FAN,
         LIGHT,
         LIGHTCOMM,
         NETWORK,
         FIRMWARE,
-        DEVICE
+        DEVICE,
+        TIME
     };
 
     virtual void *ProcessChange(ChangeType, Action::Source source) const = 0;
@@ -58,6 +59,9 @@ public:
     {
     }
 
+    virtual void ProcessAction(TimeAction &timeAction)
+    {
+    }
 
 
     // When new action types are added, they MUST be added to this union to
@@ -65,10 +69,11 @@ public:
     // type of action.
     static constexpr size_t GetLargestAction()
     {
-        /*union Actions {
+        union Actions {
             NetworkAction      networkAction;
-        };*/
-        return sizeof(NetworkAction);
+            TimeAction         timeAction;
+        };
+        return sizeof(Actions);
     }
 
     void Subscribe(const StoreSubscriber *subscriber)

@@ -1,5 +1,5 @@
 //==============================================================================
-// Copyright © 2019 Big Ass FAns
+// Copyright © 2019 Sparkwing
 //==============================================================================
 #ifndef TASK_CONFIG_INCLUDED
 #define TASK_CONFIG_INCLUDED

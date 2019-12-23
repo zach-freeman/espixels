@@ -1,12 +1,11 @@
 //==============================================================================
 // Copyright © 2019 Sparkwing
 //==============================================================================
-#include "TaskRegistry.hpp"
+#include "TimeAction.hpp"
 
-#include <cstdio>
-
-#include "FreeRTOS.h"
-#include "OsTask.hpp"
+#include "ZAssert.hpp"
+#include "Store.hpp"
+#include <cstring>
 
 //==============================================================================
 // Private defines and constants
@@ -31,30 +30,16 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TaskRegistry::AddTask(OsTask *task)
+void TimeAction::Accept(Store &store)
 {
-    mTaskList.push_back(task);
+    store.ProcessAction(*this);
 }
+
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void TaskRegistry::StartTasks()
+void TimeAction::InitializeTime()
 {
-#ifdef ESP_PLATFORM
-    portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
-    portENTER_CRITICAL(&mux);
-#else
-    portENTER_CRITICAL();
-#endif
-    for (auto task : mTaskList)
-    {
-        printf("Overall heap remaining: %u\n", xPortGetMinimumEverFreeHeapSize());
-        task->StartTask();
-    }
-#ifdef ESP_PLATFORM
-    portEXIT_CRITICAL(&mux);
-#else
-    portEXIT_CRITICAL();
-#endif
 }
+

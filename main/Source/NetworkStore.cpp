@@ -33,7 +33,7 @@ NetworkStore::NetworkStore()
 //------------------------------------------------------------------------------
 void NetworkStore::ProcessAction(NetworkAction &action)
 {
-    std::vector<NetworkActionType> &actionTypes = action.GetTypes();
+    auto &actionTypes = action.GetTypes();
     ESP_LOGE("NetworkStore", "got an action");
     for (auto &type : actionTypes)
     {

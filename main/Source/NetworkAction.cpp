@@ -1,5 +1,5 @@
 //==============================================================================
-// Copyright © 2019 Big Ass Fans
+// Copyright © 2019 Sparkwing
 //==============================================================================
 #include "NetworkAction.hpp"
 
@@ -83,15 +83,6 @@ void NetworkAction::SetData(uint8_t *ptr, uint32_t size, ServerType type, uint32
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-/*void NetworkAction::SetAccessPointList(ApList *list)
-{
-    SetActionType(NetworkAction::NetworkActionType::AcessPointList);
-    memcpy(&mAccessPointList, &list, sizeof(list));
-}*/
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
 const NetworkAction::ServerInfo_t &NetworkAction::GetServerInfo() const
 {
     return mServerInfo;
@@ -144,14 +135,6 @@ bool NetworkAction::GetIsAp() const
 {
     return mIsAp;
 }
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-/*ApList &NetworkAction::GetAccessPointList()
-{
-    return *mAccessPointList;
-}*/
 
 //------------------------------------------------------------------------------
 //

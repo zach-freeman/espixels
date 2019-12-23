@@ -1,5 +1,5 @@
 //==============================================================================
-// Copyright © 2019 Big Ass Fans
+// Copyright © 2019 Sparkwing
 //==============================================================================
 #ifndef NETWORK_ACTION_HEADER_INCLUDED
 #define NETWORK_ACTION_HEADER_INCLUDED
@@ -36,11 +36,11 @@ enum class NetworkActionType
 //==============================================================================
 // Public variables
 //==============================================================================
-
+static constexpr int MAX_NETWORK_ACTION_TYPES{2};
 //==============================================================================
 // Public function prototypes
 //==============================================================================
-class NetworkAction : public Action, public ActionType<NetworkActionType>
+class NetworkAction : public Action, public ActionType<NetworkActionType, MAX_NETWORK_ACTION_TYPES>
 {
 public:
     typedef struct
@@ -66,7 +66,6 @@ public:
 
 
     NetworkAction(NetworkActionType action) : mActionType(action){ AddType(mActionType); };
-    //void     SetAccessPointList(ApList *list);
     void     SetServerInfo(ServerInfo_t &);
     void     SetSsid(uint8_t *, size_t size);
     void     SetPassphrase(uint8_t *, size_t size);
@@ -88,7 +87,6 @@ public:
     size_t              GetPassphraseLength() const;
     const Data_t &      GetData() const;
     bool                GetIsAp() const;
-    //ApList &            GetAccessPointList();
 
 private:
     NetworkActionType mActionType{};
@@ -99,7 +97,6 @@ private:
     bool              mIsAp{};
     uint8_t *         mSsid{nullptr};
     uint8_t *         mPassphrase{nullptr};
-    //ApList *          mAccessPointList{nullptr};
     char *            mUrl{nullptr};
     char *            mDeviceId{nullptr};
     char *            mCloudId{nullptr};

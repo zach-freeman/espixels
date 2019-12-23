@@ -4,7 +4,7 @@
 #ifndef ACTION_TYPE_HPP_INCLUDED
 #define ACTION_TYPE_HPP_INCLUDED
 
-#include <vector>
+#include <array>
 
 //==============================================================================
 // Public defines and constants
@@ -16,24 +16,29 @@
 // Public variables
 //==============================================================================
 
-template <class T> 
+template <class T, int MAX_TYPES = 2> 
 class ActionType
 {
 public:
-
     //==========================================================================
     // Public function prototypes
     //==========================================================================
-    virtual void AddType(T type) final { mTypes.push_back(type); }
-    virtual std::vector<T> &GetTypes() final { return mTypes; }
+    void AddType(T type) {
+        if (mIndex < MAX_TYPES)
+        {
+            mTypes[mIndex++] = type;
+        }
+
+    }
+    auto const &GetTypes() { return mTypes; }
 
     virtual ~ActionType() = default;
 
 protected:
-    ActionType() = default;
 
 private:
-    std::vector<T> mTypes;
+    std::array<T, MAX_TYPES> mTypes{};
+    size_t mIndex{0};
 };
 
 #endif    // ACTION_TYPE_HPP_INCLUDED

@@ -1,5 +1,5 @@
 //==============================================================================
-// Copyright © 2019 Big Ass Fans
+// Copyright © 2019 Sparkwing
 //==============================================================================
 #ifndef TASK_REGISTRY_INCLUDED
 #define TASK_REGISTRY_INCLUDED

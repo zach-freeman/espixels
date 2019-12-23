@@ -6,7 +6,7 @@
 #include <cstring>
 
 #include "Dispatcher.hpp"
-#include "esp_event_loop.h"
+#include "esp_event.h"
 #include "esp_log.h"
 #include "esp_wifi.h"
 //==============================================================================
@@ -38,9 +38,9 @@ static esp_err_t callback(void *ctx, system_event_t *event)
 //==============================================================================
 EspWifi::EspWifi()
 {
-    tcpip_adapter_init();
+    ESP_ERROR_CHECK(esp_netif_init());
 
-    ESP_ERROR_CHECK(esp_event_loop_init(callback, this));
+    ESP_ERROR_CHECK(esp_event_loop_create_default());
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
     ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_RAM));
@@ -122,11 +122,11 @@ void EspWifi::WifiEventHandler(void *event)
         case SYSTEM_EVENT_STA_GOT_IP:
             ESP_LOGE(ESP_WIFI_TAG, "SYSTEM_EVENT_STA_GOT_IP");
             ESP_LOGE(ESP_WIFI_TAG,
-                     "Got IP: '%s'",
-                     ip4addr_ntoa(&wifiEvent->event_info.got_ip.ip_info.ip));
+                     "Got IP: " IPSTR "\n",
+                     IP2STR(&wifiEvent->event_info.got_ip.ip_info.ip));
             ESP_LOGE(ESP_WIFI_TAG,
-                     "Got GW: '%s'",
-                     ip4addr_ntoa(&wifiEvent->event_info.got_ip.ip_info.gw));
+                     "Got GW: " IPSTR "\n",
+                     IP2STR(&wifiEvent->event_info.got_ip.ip_info.gw));
             networkAction.AddType(NetworkActionType::GotIP);
             networkAction.SetIpAddress(wifiEvent->event_info.got_ip.ip_info.ip.addr);
             Dispatcher::GetInstance().SendAction(networkAction, portMAX_DELAY);

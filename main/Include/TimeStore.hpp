@@ -1,21 +1,14 @@
-//==============================================================================
-// Copyright © 2018 Sparkwing
-//==============================================================================
-#ifndef TASK_BASE_HPP_INCLUDED
-#define TASK_BASE_HPP_INCLUDED
+#ifndef TIME_STORE_HEADER_INCLUDED
+#define TIME_STORE_HEADER_INCLUDED
+
+#include <stdint.h>
+#include "Store.hpp"
+#include "EspWifi.hpp"
 
 //==============================================================================
 // Public defines and constants
 //==============================================================================
-#ifndef CPPUTEST
-#define FOREVER() 1
-#else
-bool FOREVER(void);
-#endif
 
-#ifndef xPortIsInsideInterrupt
-#define xPortIsInsideInterrupt() xPortInIsrContext()
-#endif
 //==============================================================================
 // Public typedefs
 //==============================================================================
@@ -27,4 +20,18 @@ bool FOREVER(void);
 //==============================================================================
 // Public function prototypes
 //==============================================================================
-#endif    // TASK_BASE_HPP_INCLUDED
+
+class TimeStore : public Store
+{
+public:
+    TimeStore();
+    virtual ~TimeStore() = default;
+    void ProcessAction(NetworkAction &action) override;
+    void ProcessAction(TimeAction &action) override;
+
+private:
+    EspWifi mWifi;
+
+};
+
+#endif    // TIME_STORE_HEADER_INCLUDED

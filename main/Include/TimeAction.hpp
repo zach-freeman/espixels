@@ -1,12 +1,14 @@
 //==============================================================================
 // Copyright © 2019 Sparkwing
 //==============================================================================
-#ifndef ZASSERT_INCLUDED
-#define ZASSERT_INCLUDED
-#include <cstdio>
+#ifndef TIME_ACTION_HEADER_INCLUDED
+#define TIME_ACTION_HEADER_INCLUDED
 
-#include "FreeRTOS.h"
-#include "task.h"
+#include <cstdint>
+#include <memory>
+
+#include "Action.hpp"
+#include "ActionType.hpp"
 //==============================================================================
 // Public defines and constants
 //==============================================================================
@@ -14,24 +16,26 @@
 //==============================================================================
 // Public typedefs
 //==============================================================================
-
+enum class TimeActionType
+{
+    None,
+    InitiailizeTime,
+};
 //==============================================================================
 // Public variables
 //==============================================================================
-// clang-format off
-#define ZAssert(x)                                                              \
-do                                                                              \
-{                                                                               \
-     if ((x) == 0)                                                              \
-     {                                                                          \
-        printf("Assert on line: %u, in file: %s.\n", __LINE__, __FILE__);       \
-        configASSERT(x);                                                        \
-    }                                                                           \
-}                                                                               \
-while (0);
-
-// clang-format on
+static constexpr int MAX_TIME_ACTION_TYPES{2};
 //==============================================================================
 // Public function prototypes
 //==============================================================================
-#endif    // ZASSERT_INCLUDED
+class TimeAction : public Action, public ActionType<TimeActionType, MAX_TIME_ACTION_TYPES>
+{
+public:
+    TimeAction(TimeActionType action) : mActionType(action){ AddType(mActionType); };
+    void   Accept(Store &) override;
+    void   InitializeTime();
+
+private:
+    TimeActionType mActionType{};
+};
+#endif    // TIME_ACTION_HEADER_INCLUDED
