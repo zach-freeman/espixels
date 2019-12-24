@@ -30,7 +30,6 @@ public:
     void ProcessAction(TimeAction &action) override;
 
 private:
-    EspWifi mWifi;
 
 };
 

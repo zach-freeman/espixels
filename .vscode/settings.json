@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "esp_system.h": "c",
-        "array": "cpp"
+        "array": "cpp",
+        "string": "cpp"
     }
 }

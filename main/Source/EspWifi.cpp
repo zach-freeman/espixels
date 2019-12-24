@@ -20,19 +20,57 @@
 //==============================================================================
 // Private variables
 //==============================================================================
-
 //==============================================================================
 // Private function definitions
 //==============================================================================
-static esp_err_t callback(void *ctx, system_event_t *event)
+static void event_handler(void * arg, esp_event_base_t event_base, int32_t event_id, void* event_data)
 {
-    if (ctx != nullptr)
+    ESP_LOGE(ESP_WIFI_TAG, "event handler");
+    NetworkAction   networkAction(NetworkActionType::None);
+    if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START)
     {
-        static_cast<EspWifi *>(ctx)->WifiEventHandler(event);
+        //const char hostname[32] = "cmonman";
+        //tcpip_adapter_set_hostname(TCPIP_ADAPTER_IF_STA, hostname);
+        //ESP_LOGI(ESP_WIFI_TAG, "hostname is esp32zach");
+        esp_wifi_connect();
+        ESP_LOGE(ESP_WIFI_TAG, "WIFI_EVENT_STA_START");
+        networkAction.AddType(NetworkActionType::WifiConnected);
+        Dispatcher::GetInstance().SendAction(networkAction);
     }
-    return ESP_OK;
+    else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED)
+    {
+        ESP_LOGE(ESP_WIFI_TAG, "WIFI_EVENT_STA_DISCONNECTED");
+        networkAction.AddType(NetworkActionType::WifiDisconnected);
+        Dispatcher::GetInstance().SendAction(networkAction, portMAX_DELAY);
+    }
+    else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP)
+    {
+        ip_event_got_ip_t* event = (ip_event_got_ip_t*)event_data;
+        ESP_LOGE(ESP_WIFI_TAG, "IP_EVENT_STA_GOT_IP");
+        ESP_LOGE(ESP_WIFI_TAG, "Got IP: " IPSTR "\n", IP2STR(&event->ip_info.ip));
+        ESP_LOGE(ESP_WIFI_TAG, "Got GW: " IPSTR "\n", IP2STR(&event->ip_info.gw));
+        networkAction.AddType(NetworkActionType::GotIP);
+        networkAction.SetIpAddress(event->ip_info.ip.addr);
+        Dispatcher::GetInstance().SendAction(networkAction, portMAX_DELAY);
+    }
+    else
+    {
+        if (event_base == IP_EVENT)
+        {
+            ESP_LOGE(ESP_WIFI_TAG, "IP_EVENT");
+        }
+        else if (event_base == WIFI_EVENT)
+        {
+            ESP_LOGE(ESP_WIFI_TAG, "WIFI_EVENT");
+            if (event_id == WIFI_EVENT_STA_CONNECTED)
+            {
+                ESP_LOGE(ESP_WIFI_TAG, "CONNECTED");
+            }
+        }
+        
+    }
+    
 }
-
 //==============================================================================
 // Public function definitions
 //==============================================================================
@@ -44,6 +82,9 @@ EspWifi::EspWifi()
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
     ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_RAM));
+
+    ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &event_handler, NULL));
+    ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &event_handler, NULL));
 
     // set default mode to station so that scanning can work
     wifi_config_t wifiConfig{};
@@ -102,70 +143,3 @@ void EspWifi::Stop()
     esp_wifi_stop();
 }
 
-void EspWifi::WifiEventHandler(void *event)
-{
-    system_event_t *wifiEvent{(system_event_t *)(event)};
-    NetworkAction   networkAction(NetworkActionType::None);
-    // THE EVENT COMES!!!!!
-    switch (wifiEvent->event_id)
-    {
-        case SYSTEM_EVENT_STA_START:
-            ESP_LOGI(ESP_WIFI_TAG, "SYSTEM_EVENT_STA_START");
-            if (mShouldConnect)
-            {
-                char hostName[33];
-                tcpip_adapter_set_hostname(TCPIP_ADAPTER_IF_STA, hostName);
-                ESP_LOGI(ESP_WIFI_TAG, "hostname is %s", hostName);
-                ESP_ERROR_CHECK(esp_wifi_connect());
-            }
-            break;
-        case SYSTEM_EVENT_STA_GOT_IP:
-            ESP_LOGE(ESP_WIFI_TAG, "SYSTEM_EVENT_STA_GOT_IP");
-            ESP_LOGE(ESP_WIFI_TAG,
-                     "Got IP: " IPSTR "\n",
-                     IP2STR(&wifiEvent->event_info.got_ip.ip_info.ip));
-            ESP_LOGE(ESP_WIFI_TAG,
-                     "Got GW: " IPSTR "\n",
-                     IP2STR(&wifiEvent->event_info.got_ip.ip_info.gw));
-            networkAction.AddType(NetworkActionType::GotIP);
-            networkAction.SetIpAddress(wifiEvent->event_info.got_ip.ip_info.ip.addr);
-            Dispatcher::GetInstance().SendAction(networkAction, portMAX_DELAY);
-            break;
-        case SYSTEM_EVENT_STA_CONNECTED:
-            ESP_LOGE(ESP_WIFI_TAG, "SYSTEM_EVENT_STA_CONNECTED");
-            networkAction.AddType(
-                NetworkActionType::WifiConnected);
-            Dispatcher::GetInstance().SendAction(networkAction);
-            break;
-        case SYSTEM_EVENT_STA_DISCONNECTED:
-            ESP_LOGE(ESP_WIFI_TAG, "SYSTEM_EVENT_STA_DISCONNECTED");
-            networkAction.AddType(
-                NetworkActionType::WifiDisconnected);
-            Dispatcher::GetInstance().SendAction(networkAction, portMAX_DELAY);
-            break;
-
-        case SYSTEM_EVENT_AP_STACONNECTED:
-            ESP_LOGI(ESP_WIFI_TAG, "SYSTEM_EVENT_AP_STACONNECTED");
-            networkAction.AddType(
-                NetworkActionType::WifiConnected);
-            Dispatcher::GetInstance().SendAction(networkAction, portMAX_DELAY);
-
-            ++mStationCount;
-            break;
-        case SYSTEM_EVENT_AP_STADISCONNECTED:
-            ESP_LOGI(ESP_WIFI_TAG, "SYSTEM_EVENT_AP_STADISCONNECTED");
-            --mStationCount;
-            if (mStationCount <= 0)
-            {
-                mStationCount = 0;
-                networkAction.AddType(
-                    NetworkActionType::WifiDisconnected);
-                Dispatcher::GetInstance().SendAction(networkAction, portMAX_DELAY);
-            }
-            break;
-        case SYSTEM_EVENT_SCAN_DONE:
-            break;
-        default:
-            break;
-    }
-}

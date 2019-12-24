@@ -41,5 +41,6 @@ void TimeAction::Accept(Store &store)
 //------------------------------------------------------------------------------
 void TimeAction::InitializeTime()
 {
+    AddType(TimeActionType::InitializeTime);
 }
 

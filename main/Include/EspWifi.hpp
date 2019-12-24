@@ -8,7 +8,9 @@
 // Public defines and constants
 //==============================================================================
 #include <cstdint>
-
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/event_groups.h"
 #include "NetworkAction.hpp"
 #include "Wifi.hpp"
 
@@ -19,7 +21,7 @@
 //==============================================================================
 // Public variables
 //==============================================================================
-
+static constexpr const char *   ESP_WIFI_TAG{"ESP Wifi"};
 //==============================================================================
 // Public function prototypes
 //==============================================================================
@@ -35,7 +37,7 @@ public:
     void WifiEventHandler(void *event);    // override;
 
 private:
-    static constexpr const char *   ESP_WIFI_TAG{"ESP Wifi"};
+
     static constexpr const uint32_t MAX_AP_CONNECTIONS{4};
     static constexpr uint32_t       MAX_SSID_LEN{32};
     static constexpr uint32_t       MAX_PASSWORD_LEN{64};

@@ -41,12 +41,14 @@ void TaskRegistry::AddTask(OsTask *task)
 //------------------------------------------------------------------------------
 void TaskRegistry::StartTasks()
 {
+    printf("start task");
 #ifdef ESP_PLATFORM
     portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
     portENTER_CRITICAL(&mux);
 #else
     portENTER_CRITICAL();
 #endif
+    printf("in here\n");
     for (auto task : mTaskList)
     {
         printf("Overall heap remaining: %u\n", xPortGetMinimumEverFreeHeapSize());

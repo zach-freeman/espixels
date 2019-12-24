@@ -36,7 +36,7 @@ public:
         if (mInstance == nullptr)
         {
             // All singletons must be created before the scheduler starts.
-            ZAssert(xTaskGetSchedulerState() == taskSCHEDULER_NOT_STARTED);
+            //ZAssert(xTaskGetSchedulerState() == taskSCHEDULER_NOT_STARTED);
 
             // Recursive instance creation detected.
             ZAssert(!mIsCreating);
@@ -95,7 +95,7 @@ public:
     {
 #ifndef SIMPLE_SINGLETON
         // You must create this mutex before the scheduler starts.
-        ZAssert(xTaskGetSchedulerState() == taskSCHEDULER_NOT_STARTED);
+        //ZAssert(xTaskGetSchedulerState() == taskSCHEDULER_NOT_STARTED);
         mMutex = xSemaphoreCreateMutex();
         ZAssert(mMutex);
 #endif

@@ -19,7 +19,7 @@
 enum class TimeActionType
 {
     None,
-    InitiailizeTime,
+    InitializeTime,
 };
 //==============================================================================
 // Public variables

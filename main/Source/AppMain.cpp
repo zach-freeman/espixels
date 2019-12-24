@@ -46,10 +46,14 @@ extern "C" void app_main()
 {
     printf("Hello zach!\n");
     nvs_flash_init();
+    StoreProvider::CreateMutex();
+    Dispatcher::CreateMutex();
+    Dispatcher::GetInstance().StartTask();
+
     NetworkStore &networkStore{*(new NetworkStore())};
     Dispatcher::GetInstance().Subscribe(networkStore);
     StoreProvider::GetInstance().SetNetworkStore(networkStore);
-    TaskRegistry::GetInstance().StartTasks();
+    //TaskRegistry::GetInstance().StartTasks();
 
     NetworkAction networkAction = NetworkAction(NetworkActionType::ClientConnect);
     uint8_t *ssid = PrivateInfo::GetSsid();
