@@ -16,7 +16,7 @@
 //==============================================================================
 // Public variables
 //==============================================================================
-
+static constexpr const char *   NETWORK_STORE_TAG{"Network Store"};
 //==============================================================================
 // Public function prototypes
 //==============================================================================
@@ -27,9 +27,20 @@ public:
     NetworkStore();
     virtual ~NetworkStore() = default;
     void ProcessAction(NetworkAction &action) override;
+    void StartWifiInfoTask();
+    void TaskWifiInfoStopTask() const;
+    void WifiInfoTask();
 
 private:
+    //==========================================================================
+    // Private constants
+    //==========================================================================
+    static constexpr uint32_t WIFI_INFO_TASK_DELAY_MILLIS{4000};
+    //==========================================================================
+    // Private data members
+    //==========================================================================
     EspWifi mWifi;
+    TaskHandle_t mWifiInfoTaskHandle{};
 
 };
 

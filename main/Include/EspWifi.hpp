@@ -32,6 +32,8 @@ public:
     void SetSsid(const char *ssid) override;
     void SetPassword(const char *password) override;
     void SetMode(WifiMode mode) override;
+    void ShowHostname();
+    void ShowIpAddress();
     void Start() override;
     void Stop() override;
     void WifiEventHandler(void *event);    // override;

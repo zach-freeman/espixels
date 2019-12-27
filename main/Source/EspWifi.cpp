@@ -8,7 +8,11 @@
 #include "Dispatcher.hpp"
 #include "esp_event.h"
 #include "esp_log.h"
-#include "esp_wifi.h"
+extern "C" {
+    #include "esp_wifi.h"
+}
+
+#include "esp_netif.h"
 //==============================================================================
 // Private defines and constants
 //==============================================================================
@@ -29,19 +33,20 @@ static void event_handler(void * arg, esp_event_base_t event_base, int32_t event
     NetworkAction   networkAction(NetworkActionType::None);
     if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START)
     {
-        //const char hostname[32] = "cmonman";
-        //tcpip_adapter_set_hostname(TCPIP_ADAPTER_IF_STA, hostname);
-        //ESP_LOGI(ESP_WIFI_TAG, "hostname is esp32zach");
         esp_wifi_connect();
         ESP_LOGE(ESP_WIFI_TAG, "WIFI_EVENT_STA_START");
-        networkAction.AddType(NetworkActionType::WifiConnected);
-        Dispatcher::GetInstance().SendAction(networkAction);
     }
     else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED)
     {
         ESP_LOGE(ESP_WIFI_TAG, "WIFI_EVENT_STA_DISCONNECTED");
         networkAction.AddType(NetworkActionType::WifiDisconnected);
         Dispatcher::GetInstance().SendAction(networkAction, portMAX_DELAY);
+    }
+    else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_CONNECTED)
+    {
+        ESP_LOGE(ESP_WIFI_TAG, "WIFI_EVENT_STA_CONNECTED");
+        networkAction.AddType(NetworkActionType::WifiConnected);
+        Dispatcher::GetInstance().SendAction(networkAction);       
     }
     else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP)
     {
@@ -62,10 +67,6 @@ static void event_handler(void * arg, esp_event_base_t event_base, int32_t event
         else if (event_base == WIFI_EVENT)
         {
             ESP_LOGE(ESP_WIFI_TAG, "WIFI_EVENT");
-            if (event_id == WIFI_EVENT_STA_CONNECTED)
-            {
-                ESP_LOGE(ESP_WIFI_TAG, "CONNECTED");
-            }
         }
         
     }
@@ -77,22 +78,11 @@ static void event_handler(void * arg, esp_event_base_t event_base, int32_t event
 EspWifi::EspWifi()
 {
     ESP_ERROR_CHECK(esp_netif_init());
-
     ESP_ERROR_CHECK(esp_event_loop_create_default());
+    esp_netif_create_default_wifi_sta();
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
-    ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_RAM));
-
-    ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &event_handler, NULL));
-    ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &event_handler, NULL));
-
-    // set default mode to station so that scanning can work
-    wifi_config_t wifiConfig{};
-    wifiConfig.sta.sort_method = WIFI_CONNECT_AP_BY_SIGNAL;
-    wifiConfig.sta.scan_method = WIFI_FAST_SCAN;
-    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
-    ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &wifiConfig));
-    ESP_ERROR_CHECK(esp_wifi_start());
+    ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_FLASH));
 }
 
 void EspWifi::SetSsid(const char *ssid)
@@ -110,36 +100,46 @@ void EspWifi::SetMode(WifiMode mode)
     mWifiMode = mode;
 }
 
+void EspWifi::ShowHostname()
+{        
+    esp_err_t err;
+    const char *name;
+    if ((err = tcpip_adapter_get_hostname(TCPIP_ADAPTER_IF_STA, &name)) != ESP_OK) {
+        ESP_LOGE(ESP_WIFI_TAG, "Err Get Hostname: %s\n", esp_err_to_name(err));
+    } else {
+        ESP_LOGE(ESP_WIFI_TAG, "Hostname: %s", (name == NULL ? "<None>" : name));
+    } 
+}
+
+void EspWifi::ShowIpAddress()
+{
+    tcpip_adapter_ip_info_t ipInfo;
+    tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ipInfo);
+    ESP_LOGE(ESP_WIFI_TAG, "Got IP: " IPSTR "\n", IP2STR(&ipInfo.ip));
+}
+
 void EspWifi::Start()
 {
+    ESP_ERROR_CHECK(esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &event_handler, NULL));
+    ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_STA_GOT_IP, &event_handler, NULL));
     esp_wifi_set_ps(WIFI_PS_NONE);
     wifi_config_t wifiConfig{};
-    if (mWifiMode == WifiMode::Station)
-    {
-        strncpy((char *)wifiConfig.sta.ssid, mSsid, MAX_SSID_LEN);
-        strncpy((char *)wifiConfig.sta.password, mPassword, MAX_PASSWORD_LEN);
-        ESP_LOGE(ESP_WIFI_TAG, "ssid is %s", mSsid);
-        ESP_LOGE(ESP_WIFI_TAG, "passpharase is %s", mPassword);
-        ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
-        ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &wifiConfig));
-        mShouldConnect = true;
-    }
-    else if (mWifiMode == WifiMode::AccessPoint)
-    {
-        strncpy((char *)wifiConfig.ap.ssid, mSsid, MAX_SSID_LEN);
-        wifiConfig.ap.ssid_len = strlen(mSsid);
-        strncpy((char *)wifiConfig.ap.password, mPassword, MAX_PASSWORD_LEN);
-        wifiConfig.ap.authmode       = WIFI_AUTH_WPA_WPA2_PSK;
-        wifiConfig.ap.max_connection = MAX_AP_CONNECTIONS;
-        ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_AP));
-        ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_AP, &wifiConfig));
-    }
+    strncpy((char *)wifiConfig.sta.ssid, mSsid, MAX_SSID_LEN);
+    strncpy((char *)wifiConfig.sta.password, mPassword, MAX_PASSWORD_LEN);
+    ESP_LOGE(ESP_WIFI_TAG, "ssid is %s", mSsid);
+    ESP_LOGE(ESP_WIFI_TAG, "passpharase is %s", mPassword);
+    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
+    ESP_ERROR_CHECK(esp_wifi_set_config(ESP_IF_WIFI_STA, &wifiConfig));
+    mShouldConnect = true;
     ESP_ERROR_CHECK(esp_wifi_start());
 }
 
 void EspWifi::Stop()
 {
+    ESP_LOGE(ESP_WIFI_TAG, "Stop event received");
     mShouldConnect = false;
+    esp_event_handler_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, &event_handler);
+    esp_event_handler_unregister(IP_EVENT, IP_EVENT_STA_GOT_IP, &event_handler);
     esp_wifi_stop();
 }
 
