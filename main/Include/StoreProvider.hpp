@@ -7,6 +7,7 @@
 #include <cstddef>
 #include "NetworkStore.hpp"
 #include "Singleton.hpp"
+#include "TimeStore.hpp"
 //==============================================================================
 // Public defines and constants
 //==============================================================================
@@ -29,6 +30,8 @@ public:
     virtual ~StoreProvider() = default;
     NetworkStore & GetNetworkStore();
     void SetNetworkStore(NetworkStore &networkStore);
+    TimeStore & GetTimeStore();
+    void SetTimeStore(TimeStore &timeStore);
 
 protected:
 private:
@@ -43,6 +46,8 @@ private:
     // Private data members
     //==========================================================================
     NetworkStore *mNetworkStore{nullptr};
+    TimeStore *mTimeStore{nullptr};
+    
 };
 
 #endif    // STORE_PROVIDER_HPP_INCLUDED

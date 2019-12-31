@@ -10,6 +10,7 @@
 #include "PrivateInfo.h"
 #include "StoreProvider.hpp"
 #include "TaskRegistry.hpp"
+#include "TimeStore.hpp"
 #include "esp_log.h"
 #include "mdns.h"
 #include "nvs_flash.h"
@@ -59,7 +60,10 @@ extern "C" void app_main()
     NetworkStore &networkStore{*(new NetworkStore())};
     Dispatcher::GetInstance().Subscribe(networkStore);
     StoreProvider::GetInstance().SetNetworkStore(networkStore);
-    //TaskRegistry::GetInstance().StartTasks();
+
+    TimeStore &timeStore{*(new TimeStore())};
+    Dispatcher::GetInstance().Subscribe(timeStore);
+    StoreProvider::GetInstance().SetTimeStore(timeStore);
 
     NetworkAction networkAction = NetworkAction(NetworkActionType::ClientConnect);
     uint8_t *ssid = PrivateInfo::GetSsid();

@@ -44,3 +44,19 @@ void StoreProvider::SetNetworkStore(NetworkStore &networkStore)
 {
     mNetworkStore = &networkStore;
 }
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+TimeStore &StoreProvider::GetTimeStore()
+{
+    return *mTimeStore;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void StoreProvider::SetTimeStore(TimeStore &timeStore)
+{
+    mTimeStore = &timeStore;
+}
