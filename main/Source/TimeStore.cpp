@@ -1,6 +1,5 @@
 #include "TimeStore.hpp"
 #include "esp_log.h"
-#include "esp_sntp.h"
 
 //==============================================================================
 // Private defines and constants
@@ -20,10 +19,7 @@
 //==============================================================================
 // Public function definitions
 //==============================================================================
-void time_sync_notification_cb(struct timeval *tv)
-{
-    ESP_LOGE(TIME_STORE_TAG, "Notification of a time synch event");
-}
+
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
@@ -34,9 +30,18 @@ TimeStore::TimeStore()
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
+void TimeStore::ProcessAction(NetworkAction &action)
+{
+
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
 void TimeStore::ProcessAction(TimeAction &action)
 {
     auto &actionTypes = action.GetTypes();
+    StoreSubscriber::ChangeType changeType{StoreSubscriber::ChangeType::NONE};
     ESP_LOGE(TIME_STORE_TAG, "got an action");
     for (auto &type : actionTypes)
     {
@@ -44,19 +49,29 @@ void TimeStore::ProcessAction(TimeAction &action)
         {
             case TimeActionType::InitializeTime:
                 ESP_LOGE(TIME_STORE_TAG, "got an initialize time action");
-                InitializeSntp();
+                changeType = StoreSubscriber::ChangeType::TIME;
                 break;
             default:
                 break;
         }
+        if (changeType != StoreSubscriber::ChangeType::NONE)
+        {
+            PublishChange(Action::Source::Time, changeType);
+        }
     }
 }
 
-void TimeStore::InitializeSntp()
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TimeStore::PublishChange(Action::Source actionSource,
+                             StoreSubscriber::ChangeType changeType)
 {
-    ESP_LOGE(TIME_STORE_TAG, "Initializing SNTP");
-    sntp_setoperatingmode(SNTP_OPMODE_POLL);
-    sntp_setservername(0, "pool.ntp.org");
-    sntp_set_time_sync_notification_cb(time_sync_notification_cb);
-}
+    // publish a message to subcribers
+    for (auto sub : subscribers)
+    {
+        sub->ProcessChange(changeType, actionSource);
+    }   
+}                             
+
 

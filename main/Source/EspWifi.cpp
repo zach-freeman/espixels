@@ -13,6 +13,7 @@ extern "C" {
 }
 
 #include "esp_netif.h"
+#include "TimeAction.hpp"
 //==============================================================================
 // Private defines and constants
 //==============================================================================
@@ -57,6 +58,9 @@ static void event_handler(void * arg, esp_event_base_t event_base, int32_t event
         networkAction.AddType(NetworkActionType::GotIP);
         networkAction.SetIpAddress(event->ip_info.ip.addr);
         Dispatcher::GetInstance().SendAction(networkAction, portMAX_DELAY);
+        TimeAction timeAction(TimeActionType::None);
+        timeAction.AddType(TimeActionType::InitializeTime);
+        Dispatcher::GetInstance().SendAction(timeAction, portMAX_DELAY);
     }
     else
     {

@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 #include "Store.hpp"
-#include "EspWifi.hpp"
 
 //==============================================================================
 // Public defines and constants
@@ -30,8 +29,8 @@ public:
     void ProcessAction(TimeAction &action) override;
 
 private:
-    void InitializeSntp();
-
+    void PublishChange(Action::Source                actionSource,
+                       StoreSubscriber::ChangeType changeType);
 };
 
 #endif    // TIME_STORE_HEADER_INCLUDED

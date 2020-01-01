@@ -31,6 +31,7 @@ public:
         Ble,
         Cloud,
         Ir,
+        Time,
         WiFi,
         Light,
         Host

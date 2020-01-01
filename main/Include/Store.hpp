@@ -31,6 +31,7 @@ class StoreSubscriber
 public:
     enum class ChangeType
     {
+        NONE,
         LIGHT,
         LIGHTCOMM,
         NETWORK,

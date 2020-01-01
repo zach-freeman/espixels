@@ -5,6 +5,7 @@
 #include "esp_spi_flash.h"
 #include "ZAssert.hpp"
 #include "NetworkAction.hpp"
+#include "NetworkTimeController.hpp"
 #include "Dispatcher.hpp"
 #include "NetworkStore.hpp"
 #include "PrivateInfo.h"
@@ -64,6 +65,10 @@ extern "C" void app_main()
     TimeStore &timeStore{*(new TimeStore())};
     Dispatcher::GetInstance().Subscribe(timeStore);
     StoreProvider::GetInstance().SetTimeStore(timeStore);
+
+    NetworkTimeController &networkTime{*(new NetworkTimeController(timeStore))};
+    networkTime.StartTask();
+    (void)networkTime;
 
     NetworkAction networkAction = NetworkAction(NetworkActionType::ClientConnect);
     uint8_t *ssid = PrivateInfo::GetSsid();
