@@ -2,10 +2,12 @@
 // Copyright © 2019 Sparkwing
 //==============================================================================
 #include "NetworkTimeController.hpp"
+#include "Dispatcher.hpp"
 #include "esp_log.h"
 #include "esp_sntp.h"
 #include "TaskBase.hpp"
 #include "TaskConfig.hpp"
+#include "TimeAction.hpp"
 
 //==============================================================================
 // Local defines and constants
@@ -110,6 +112,9 @@ void NetworkTimeController::NtpTask()
                 localtime_r(&now, &timeinfo);
                 strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
                 ESP_LOGI(NETWORK_TIME_CONTROLLER_TAG, "The current date/time in New York is: %s", strftime_buf);
+                TimeAction timeAction(TimeActionType::None);
+                timeAction.SetTime(strftime_buf);
+                Dispatcher::GetInstance().SendAction(timeAction, portMAX_DELAY);
             }
         }
     }

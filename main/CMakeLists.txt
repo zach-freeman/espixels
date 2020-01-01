@@ -10,6 +10,8 @@ idf_component_register(SRCS "Source/AppMain.cpp"
                             "Source/TimeAction.cpp"
                             "Source/TimeStore.cpp"
                             "Source/StoreProvider.cpp"
+                            "Source/UIAction.cpp"
+                            "Source/UIStore.cpp"
                     INCLUDE_DIRS "Include"
                                  "../esp-idf/components/freertos/include/freertos"
                     REQUIRES lvgl_ili9341 lvgl spi_flash nvs_flash mdns)

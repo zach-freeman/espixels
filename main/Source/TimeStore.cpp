@@ -51,6 +51,9 @@ void TimeStore::ProcessAction(TimeAction &action)
                 ESP_LOGE(TIME_STORE_TAG, "got an initialize time action");
                 changeType = StoreSubscriber::ChangeType::TIME;
                 break;
+            case TimeActionType::SetTime:
+                mTimeString = action.GetTime();
+                break;
             default:
                 break;
         }
@@ -59,6 +62,11 @@ void TimeStore::ProcessAction(TimeAction &action)
             PublishChange(Action::Source::Time, changeType);
         }
     }
+}
+
+void TimeStore::ProcessAction(UIAction &action)
+{
+    
 }
 
 //------------------------------------------------------------------------------
@@ -72,6 +80,14 @@ void TimeStore::PublishChange(Action::Source actionSource,
     {
         sub->ProcessChange(changeType, actionSource);
     }   
-}                             
+} 
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+std::string TimeStore::GetTimeString()
+{
+    return mTimeString;
+}
 
 

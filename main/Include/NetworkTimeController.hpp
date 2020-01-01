@@ -19,7 +19,7 @@
 //==============================================================================
 // Public variables
 //==============================================================================
-static constexpr const char *   NETWORK_TIME_CONTROLLER_TAG{"Time Store"};
+static constexpr const char *   NETWORK_TIME_CONTROLLER_TAG{"Network Time Controller"};
 //==============================================================================
 // Public function prototypes
 //==============================================================================
@@ -55,6 +55,7 @@ private:
     TimeStore &mTimeStore;
     TaskHandle_t mNtpSyncTaskHandle{};
     Action::Source mActionSource;
+    std::string mCurrentTimeString;
     //==========================================================================
     // Private method prototypes
     //==========================================================================

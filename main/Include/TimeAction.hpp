@@ -20,6 +20,7 @@ enum class TimeActionType
 {
     None,
     InitializeTime,
+    SetTime
 };
 //==============================================================================
 // Public variables
@@ -34,8 +35,11 @@ public:
     TimeAction(TimeActionType action) : mActionType(action){ AddType(mActionType); };
     void   Accept(Store &) override;
     void   InitializeTime();
+    void   SetTime(std::string timeString);
+    std::string GetTime();
 
 private:
     TimeActionType mActionType{};
+    std::string mTimeString;
 };
 #endif    // TIME_ACTION_HEADER_INCLUDED

@@ -60,3 +60,19 @@ void StoreProvider::SetTimeStore(TimeStore &timeStore)
 {
     mTimeStore = &timeStore;
 }
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+UIStore &StoreProvider::GetUIStore()
+{
+    return *mUIStore;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void StoreProvider::SetUIStore(UIStore &uiStore)
+{
+    mUIStore = &uiStore;
+}

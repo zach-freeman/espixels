@@ -8,6 +8,7 @@
 #include "NetworkStore.hpp"
 #include "Singleton.hpp"
 #include "TimeStore.hpp"
+#include "UIStore.hpp"
 //==============================================================================
 // Public defines and constants
 //==============================================================================
@@ -32,6 +33,8 @@ public:
     void SetNetworkStore(NetworkStore &networkStore);
     TimeStore & GetTimeStore();
     void SetTimeStore(TimeStore &timeStore);
+    UIStore & GetUIStore();
+    void SetUIStore(UIStore &uiStore);
 
 protected:
 private:
@@ -47,6 +50,7 @@ private:
     //==========================================================================
     NetworkStore *mNetworkStore{nullptr};
     TimeStore *mTimeStore{nullptr};
+    UIStore *mUIStore{nullptr};
     
 };
 

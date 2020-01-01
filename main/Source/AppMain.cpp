@@ -12,6 +12,8 @@
 #include "StoreProvider.hpp"
 #include "TaskRegistry.hpp"
 #include "TimeStore.hpp"
+#include "UIAction.hpp"
+#include "UIStore.hpp"
 #include "esp_log.h"
 #include "mdns.h"
 #include "nvs_flash.h"
@@ -70,12 +72,20 @@ extern "C" void app_main()
     networkTime.StartTask();
     (void)networkTime;
 
+    UIStore &uiStore{*(new UIStore())};
+    Dispatcher::GetInstance().Subscribe(uiStore);
+    StoreProvider::GetInstance().SetUIStore(uiStore);
+
     NetworkAction networkAction = NetworkAction(NetworkActionType::ClientConnect);
     uint8_t *ssid = PrivateInfo::GetSsid();
     networkAction.SetSsid(ssid, sizeof(ssid));
     uint8_t *passphrase = PrivateInfo::GetPassphrase();
     networkAction.SetPassphrase(passphrase, sizeof(passphrase));
     Dispatcher::GetInstance().SendAction(networkAction);
+
+    UIAction uiAction = UIAction(UIActionType::None);
+    uiAction.Initialize();
+    Dispatcher::GetInstance().SendAction(uiAction);
 
     for (;;)
     {

@@ -1,9 +1,14 @@
-#ifndef TIME_STORE_HEADER_INCLUDED
-#define TIME_STORE_HEADER_INCLUDED
+//==============================================================================
+// Copyright © 2019 Sparkwing
+//==============================================================================
+#ifndef UI_ACTION_HEADER_INCLUDED
+#define UI_ACTION_HEADER_INCLUDED
 
-#include <stdint.h>
-#include "Store.hpp"
+#include <cstdint>
+#include <memory>
 
+#include "Action.hpp"
+#include "ActionType.hpp"
 //==============================================================================
 // Public defines and constants
 //==============================================================================
@@ -11,29 +16,25 @@
 //==============================================================================
 // Public typedefs
 //==============================================================================
-
+enum class UIActionType
+{
+    None,
+    Initialize
+};
 //==============================================================================
 // Public variables
 //==============================================================================
-static constexpr const char *   TIME_STORE_TAG{"Time Store"};
+static constexpr int MAX_UI_ACTION_TYPES{2};
 //==============================================================================
 // Public function prototypes
 //==============================================================================
-
-class TimeStore : public Store
+class UIAction : public Action, public ActionType<UIActionType, MAX_UI_ACTION_TYPES>
 {
 public:
-    TimeStore();
-    virtual ~TimeStore() = default;
-    void ProcessAction(NetworkAction &action) override;
-    void ProcessAction(TimeAction &action) override;
-    void ProcessAction(UIAction &action) override;
-    std::string GetTimeString();
-
+    UIAction(UIActionType action) : mActionType(action){ AddType(mActionType); };
+    void   Accept(Store &) override;
+    void   Initialize();
 private:
-    void PublishChange(Action::Source                actionSource,
-                       StoreSubscriber::ChangeType changeType);
-    std::string mTimeString;
+    UIActionType mActionType{};
 };
-
-#endif    // TIME_STORE_HEADER_INCLUDED
+#endif    // UI_ACTION_HEADER_INCLUDED

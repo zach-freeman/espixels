@@ -1,14 +1,9 @@
 //==============================================================================
 // Copyright © 2020 Sparkwing
 //==============================================================================
-#include "UIStore.hpp"
-#include "esp_log.h"
-#include "esp_system.h"
-#include "driver/gpio.h"
-#include "lvgl/lvgl.h"
-#include "disp_spi.h"
-#include "ili9341.h"
-
+#include "UIAction.hpp"
+#include "ZAssert.hpp"
+#include "Store.hpp"
 //==============================================================================
 // Local defines and constants
 //==============================================================================
@@ -28,46 +23,15 @@
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-UIStore::UIStore()
+void UIAction::Accept(Store &store)
 {
-
+    store.ProcessAction(*this);
 }
 
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-void UIStore::ProcessAction(NetworkAction &action)
+void UIAction::Initialize()
 {
-
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void UIStore::ProcessAction(TimeAction &action)
-{
-
-}
-
-//------------------------------------------------------------------------------
-//
-//------------------------------------------------------------------------------
-void UIStore::ProcessAction(UIAction &action)
-{
-   auto &actionTypes = action.GetTypes();
-    ESP_LOGE(UI_STORE_TAG, "got an action");
-    for (auto &type : actionTypes)
-    {
-        switch (type)
-        {
-            case UIActionType::Initialize:
-                ESP_LOGE(UI_STORE_TAG, "got an initialize action");
-                lv_init();
-                disp_spi_init();
-	            ili9341_init();
-                break;
-            default:
-                break;
-        }
-    }
+    AddType(UIActionType::Initialize);
 }

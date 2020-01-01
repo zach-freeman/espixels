@@ -10,6 +10,7 @@
 
 #include "NetworkAction.hpp"
 #include "TimeAction.hpp"
+#include "UIAction.hpp"
 //==============================================================================
 // Public defines and constants
 //==============================================================================
@@ -37,7 +38,8 @@ public:
         NETWORK,
         FIRMWARE,
         DEVICE,
-        TIME
+        TIME,
+        UI
     };
 
     virtual void *ProcessChange(ChangeType, Action::Source source) const = 0;
@@ -64,6 +66,10 @@ public:
     {
     }
 
+    virtual void ProcessAction(UIAction &uiAction)
+    {
+    }
+
 
     // When new action types are added, they MUST be added to this union to
     // ensure that the Dispatcher queue elements are large enough to hold any
@@ -73,6 +79,7 @@ public:
         union Actions {
             NetworkAction      networkAction;
             TimeAction         timeAction;
+            UIAction           uiAction;
         };
         return sizeof(Actions);
     }

@@ -44,3 +44,20 @@ void TimeAction::InitializeTime()
     AddType(TimeActionType::InitializeTime);
 }
 
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void TimeAction::SetTime(std::string timeString)
+{
+    AddType(TimeActionType::SetTime);
+    mTimeString = timeString;
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+std::string TimeAction::GetTime()
+{
+    return mTimeString;
+}
+

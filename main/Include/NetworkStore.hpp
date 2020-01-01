@@ -27,6 +27,8 @@ public:
     NetworkStore();
     virtual ~NetworkStore() = default;
     void ProcessAction(NetworkAction &action) override;
+    void ProcessAction(TimeAction &action) override;
+    void ProcessAction(UIAction &action) override;
     void StartWifiInfoTask();
     void TaskWifiInfoStopTask() const;
     void WifiInfoTask();
