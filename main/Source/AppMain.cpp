@@ -13,6 +13,7 @@
 #include "TaskRegistry.hpp"
 #include "TimeStore.hpp"
 #include "UIAction.hpp"
+#include "UiController.hpp"
 #include "UIStore.hpp"
 #include "esp_log.h"
 #include "mdns.h"
@@ -75,6 +76,10 @@ extern "C" void app_main()
     UIStore &uiStore{*(new UIStore())};
     Dispatcher::GetInstance().Subscribe(uiStore);
     StoreProvider::GetInstance().SetUIStore(uiStore);
+
+    UiController &uiController{*(new UiController(uiStore))};
+    uiController.StartUiTask();
+    (void)uiController;
 
     NetworkAction networkAction = NetworkAction(NetworkActionType::ClientConnect);
     uint8_t *ssid = PrivateInfo::GetSsid();

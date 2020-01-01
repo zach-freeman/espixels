@@ -19,7 +19,8 @@
 enum class UIActionType
 {
     None,
-    Initialize
+    Initialize,
+    ShowTime
 };
 //==============================================================================
 // Public variables
@@ -34,6 +35,7 @@ public:
     UIAction(UIActionType action) : mActionType(action){ AddType(mActionType); };
     void   Accept(Store &) override;
     void   Initialize();
+    void   ShowTime();
 private:
     UIActionType mActionType{};
 };

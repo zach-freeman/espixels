@@ -35,3 +35,11 @@ void UIAction::Initialize()
 {
     AddType(UIActionType::Initialize);
 }
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void UIAction::ShowTime()
+{
+    AddType(UIActionType::ShowTime);
+}

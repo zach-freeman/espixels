@@ -41,10 +41,10 @@ void TimeStore::ProcessAction(NetworkAction &action)
 void TimeStore::ProcessAction(TimeAction &action)
 {
     auto &actionTypes = action.GetTypes();
-    StoreSubscriber::ChangeType changeType{StoreSubscriber::ChangeType::NONE};
     ESP_LOGE(TIME_STORE_TAG, "got an action");
     for (auto &type : actionTypes)
     {
+        StoreSubscriber::ChangeType changeType{StoreSubscriber::ChangeType::NONE};
         switch (type)
         {
             case TimeActionType::InitializeTime:

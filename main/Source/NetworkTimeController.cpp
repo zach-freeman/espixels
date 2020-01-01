@@ -8,6 +8,7 @@
 #include "TaskBase.hpp"
 #include "TaskConfig.hpp"
 #include "TimeAction.hpp"
+#include "UIAction.hpp"
 
 //==============================================================================
 // Local defines and constants
@@ -79,7 +80,7 @@ void NetworkTimeController::StartTask()
                     &mNtpSyncTaskHandle)
         != pdPASS)
     {
-
+        ESP_LOGE(NETWORK_TIME_CONTROLLER_TAG, "Error: can't start ntp task");
     }
 }
 
@@ -112,9 +113,14 @@ void NetworkTimeController::NtpTask()
                 localtime_r(&now, &timeinfo);
                 strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
                 ESP_LOGI(NETWORK_TIME_CONTROLLER_TAG, "The current date/time in New York is: %s", strftime_buf);
+                // send the set time action
                 TimeAction timeAction(TimeActionType::None);
                 timeAction.SetTime(strftime_buf);
                 Dispatcher::GetInstance().SendAction(timeAction, portMAX_DELAY);
+                // send the ui action
+                UIAction uiAction(UIActionType::None);
+                uiAction.ShowTime();
+                Dispatcher::GetInstance().SendAction(uiAction, portMAX_DELAY);
             }
         }
     }
