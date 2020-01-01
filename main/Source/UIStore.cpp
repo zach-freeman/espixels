@@ -83,7 +83,7 @@ void UIStore::ProcessAction(UIAction &action)
             break;
         case UIActionType::ShowTime:
             // show the time
-            changeType = StoreSubscriber::ChangeType::UI;
+            changeType = StoreSubscriber::ChangeType::TIME;
             break;
         default:
             break;

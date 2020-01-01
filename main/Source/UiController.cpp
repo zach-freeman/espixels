@@ -8,6 +8,7 @@
 #include "TaskBase.hpp"
 #include "TaskConfig.hpp"
 #include "TimeAction.hpp"
+#include "StoreProvider.hpp"
 
 //==============================================================================
 // Local defines and constants
@@ -41,12 +42,19 @@ void *UiController::ProcessChange(StoreSubscriber::ChangeType changeType,
 {
     if (source == Action::Source::Internal)
     {
-        if (changeType == StoreSubscriber::ChangeType::UI)
+        Event_t event{};
+        switch (changeType)
         {
-            Event_t event{};
+        case StoreSubscriber::ChangeType::UI:
             event.helloWorld = 1;
-            xTaskNotify(mUiTaskHandle, event.rawBits, eSetBits);
+            break;
+        case StoreSubscriber::ChangeType::TIME:
+            event.showTime =1;
+            break;
+        default:
+            break;
         }
+        xTaskNotify(mUiTaskHandle, event.rawBits, eSetBits);
     }
     return nullptr;
 }
@@ -90,6 +98,21 @@ void UiController::UiTask()
                 * NULL means align on parent (which is the screen now)
                 * 0, 0 at the end means an x, y offset after alignment*/
                 lv_obj_align(label1, NULL, LV_ALIGN_CENTER, 0, 0);
+            }
+            else if (event.showTime)
+            {
+                lv_obj_t *screen = lv_disp_get_scr_act(NULL); /* Get current screen */
+                /*Create a Label on the currently active screen*/
+                lv_obj_t *label1 = lv_label_create(screen, NULL);
+
+                /*Modify the Label's text*/
+                std::string time = StoreProvider::GetInstance().GetTimeStore().GetTimeString();
+                lv_label_set_text(label1, time.c_str());
+
+                /* Align the Label to the center
+                * NULL means align on parent (which is the screen now)
+                * 0, 0 at the end means an x, y offset after alignment*/
+                lv_obj_align(label1, NULL, LV_ALIGN_CENTER, 0, 0); 
             }
         }
         vTaskDelay(pdMS_TO_TICKS(10));
