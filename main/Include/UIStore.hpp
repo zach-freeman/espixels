@@ -5,6 +5,8 @@
 #define UISTORE_HPP_INCLUDED
 
 #include <stdint.h>
+#include "ili9341.h"
+#include "lvgl/lvgl.h"
 #include "Store.hpp"
 
 static constexpr const char *UI_STORE_TAG{"UI Store"};
@@ -40,7 +42,9 @@ private:
     //==========================================================================
     // Private member variables
     //==========================================================================
-
+    static lv_color_t displayBuffer1[DISP_BUF_SIZE];
+    static lv_color_t displayBuffer2[DISP_BUF_SIZE];
+    static lv_disp_buf_t disp_buf;
     //==========================================================================
     // Private methods
     //==========================================================================

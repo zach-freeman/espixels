@@ -8,8 +8,6 @@
 #include "esp_system.h"
 #include "driver/gpio.h"
 #include "disp_spi.h"
-#include "ili9341.h"
-#include "lvgl/lvgl.h"
 
 //==============================================================================
 // Local defines and constants
@@ -18,7 +16,9 @@
 //==============================================================================
 // Local variables
 //==============================================================================
-
+lv_color_t UIStore::displayBuffer1[DISP_BUF_SIZE];
+lv_color_t UIStore::displayBuffer2[DISP_BUF_SIZE];
+lv_disp_buf_t UIStore::disp_buf;
 //==============================================================================
 // Static function definitions
 //==============================================================================
@@ -73,10 +73,7 @@ void UIStore::ProcessAction(UIAction &action)
             lv_init();
             disp_spi_init();
             ili9341_init();
-            static lv_color_t buf1[DISP_BUF_SIZE];
-            static lv_color_t buf2[DISP_BUF_SIZE];
-            static lv_disp_buf_t disp_buf;
-            lv_disp_buf_init(&disp_buf, buf1, buf2, DISP_BUF_SIZE);
+            lv_disp_buf_init(&disp_buf, displayBuffer1, displayBuffer2, DISP_BUF_SIZE);
             lv_disp_drv_t disp_drv;
             lv_disp_drv_init(&disp_drv); 
             disp_drv.flush_cb = ili9341_flush;
