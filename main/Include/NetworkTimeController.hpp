@@ -7,6 +7,7 @@
 #include "FreeRTOS.h"
 #include "queue.h"
 #include "task.h"
+#include "timers.h"
 
 //==============================================================================
 // Public defines and constants
@@ -31,6 +32,7 @@ public:
     void StartTask();
     void TaskStop() const;
     void NtpTask();
+    void UpdateTime();
     void *ProcessChange(StoreSubscriber::ChangeType change,
                         Action::Source source) const override;
 
@@ -41,19 +43,21 @@ private:
     typedef union {
         uint32_t rawBits;
             struct {
+                uint32_t initializeTime : 1;
                 uint32_t updateTime : 1;
             };
     } Event_t;
     //==========================================================================
     // Private constants
     //==========================================================================
-    static constexpr uint32_t SNTP_SYNC_STATUS_DELAY{2000};
-
+    static constexpr uint32_t SNTP_SYNC_STATUS_DELAY_MS{2000};
+    static constexpr uint32_t TIME_UPDATE_TIMER_MS{10000};
     //==========================================================================
     // Private data members
     //==========================================================================
     TimeStore &mTimeStore;
     TaskHandle_t mNtpSyncTaskHandle{};
+    TimerHandle_t mTimeUpdateTimer{};
     Action::Source mActionSource;
     std::string mCurrentTimeString;
     //==========================================================================

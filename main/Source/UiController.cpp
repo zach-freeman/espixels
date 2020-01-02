@@ -101,6 +101,7 @@ void UiController::UiTask()
             }
             else if (event.showTime)
             {
+                lv_obj_clean(lv_scr_act());
                 lv_obj_t *screen = lv_disp_get_scr_act(NULL); /* Get current screen */
                 /*Create a Label on the currently active screen*/
                 lv_obj_t *label1 = lv_label_create(screen, NULL);
