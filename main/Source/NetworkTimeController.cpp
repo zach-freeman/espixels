@@ -124,7 +124,7 @@ void NetworkTimeController::NtpTask()
                 char strftime_buf[64];
                 // print local time
                 localtime_r(&now, &timeinfo);
-                strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
+                strftime(strftime_buf, sizeof(strftime_buf), TIME_FORMAT, &timeinfo);
                 ESP_LOGI(NETWORK_TIME_CONTROLLER_TAG, "The current date/time in New York is: %s", strftime_buf);
                 // we got the time so now we can start the timer that updates the time
                 xTimerStart(mTimeUpdateTimer, 0);
@@ -149,7 +149,7 @@ void NetworkTimeController::NtpTask()
                 char strftime_buf[64];
                 // print local time
                 localtime_r(&now, &timeinfo);
-                strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
+                strftime(strftime_buf, sizeof(strftime_buf), TIME_FORMAT, &timeinfo);
                 // send the set time action
                 TimeAction timeAction(TimeActionType::None);
                 timeAction.SetTime(strftime_buf);
