@@ -65,5 +65,6 @@ private:
     // Private method prototypes
     //==========================================================================
     void InitializeSntp();
+    void NotifyTimeUpdated(const std::string &timeString);
 };
 #endif // NETWORK_TIME_CONTROLLER_INCLUDED_HPP

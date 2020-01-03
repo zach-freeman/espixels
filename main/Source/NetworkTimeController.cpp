@@ -109,11 +109,13 @@ void NetworkTimeController::NtpTask()
         Event_t event{};
         if (xTaskNotifyWait(ULONG_MAX, ULONG_MAX, &event.rawBits, portMAX_DELAY) == pdTRUE)
         {
+            char strftime_buf[64];
+            struct tm timeinfo = {};
+            time_t now = 0;
+            struct timeval tv_now = {};
             if (event.initializeTime)
             {
                 // wait for time to be set
-                time_t now = 0;
-                struct tm timeinfo = {};
                 int retry = 0;
                 const int retry_count = 10;
                 while (sntp_get_sync_status() == SNTP_SYNC_STATUS_RESET && ++retry < retry_count) {
@@ -121,46 +123,39 @@ void NetworkTimeController::NtpTask()
                     vTaskDelay(pdMS_TO_TICKS(SNTP_SYNC_STATUS_DELAY_MS));
                 }
                 time(&now);
-                char strftime_buf[64];
-                // print local time
-                localtime_r(&now, &timeinfo);
-                strftime(strftime_buf, sizeof(strftime_buf), TIME_FORMAT, &timeinfo);
-                ESP_LOGI(NETWORK_TIME_CONTROLLER_TAG, "The current date/time in New York is: %s", strftime_buf);
+                tv_now = { .tv_sec = now, .tv_usec = 0 };
+                settimeofday(&tv_now, NULL);
                 // we got the time so now we can start the timer that updates the time
                 xTimerStart(mTimeUpdateTimer, 0);
-                struct timeval tv_now = { .tv_sec = now, .tv_usec = 0 };
-                settimeofday(&tv_now, NULL);
-                // send the set time action
-                TimeAction timeAction(TimeActionType::None);
-                timeAction.SetTime(strftime_buf);
-                Dispatcher::GetInstance().SendAction(timeAction, portMAX_DELAY);
-                // send the ui action
-                UIAction uiAction(UIActionType::None);
-                uiAction.ShowTime();
-                Dispatcher::GetInstance().SendAction(uiAction, portMAX_DELAY);
             }
             else if (event.updateTime)
             {
-                struct timeval tv_now = {};
                 struct timezone tzone = {};
                 gettimeofday(&tv_now, &tzone);
-                struct tm timeinfo = {};
-                time_t now = (time_t)tv_now.tv_sec;
-                char strftime_buf[64];
-                // print local time
-                localtime_r(&now, &timeinfo);
-                strftime(strftime_buf, sizeof(strftime_buf), TIME_FORMAT, &timeinfo);
-                // send the set time action
-                TimeAction timeAction(TimeActionType::None);
-                timeAction.SetTime(strftime_buf);
-                Dispatcher::GetInstance().SendAction(timeAction, portMAX_DELAY);
-                // send the ui action
-                UIAction uiAction(UIActionType::None);
-                uiAction.ShowTime();
-                Dispatcher::GetInstance().SendAction(uiAction, portMAX_DELAY);
+                now = (time_t)tv_now.tv_sec;
             }
+            // print local time
+            localtime_r(&now, &timeinfo);
+            strftime(strftime_buf, sizeof(strftime_buf), TIME_FORMAT, &timeinfo);
+            std::string timeString(strftime_buf);
+            NotifyTimeUpdated(timeString);
         }
     }
+}
+
+//------------------------------------------------------------------------------
+//
+//------------------------------------------------------------------------------
+void NetworkTimeController::NotifyTimeUpdated(const std::string &timeString)
+{
+    // send the set time action
+    TimeAction timeAction(TimeActionType::None);
+    timeAction.SetTime(timeString);
+    Dispatcher::GetInstance().SendAction(timeAction, portMAX_DELAY);
+    // send the ui action
+    UIAction uiAction(UIActionType::None);
+    uiAction.ShowTime();
+    Dispatcher::GetInstance().SendAction(uiAction, portMAX_DELAY);  
 }
 
 //------------------------------------------------------------------------------

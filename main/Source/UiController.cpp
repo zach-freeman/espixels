@@ -47,7 +47,7 @@ void *UiController::ProcessChange(StoreSubscriber::ChangeType changeType,
         switch (changeType)
         {
         case StoreSubscriber::ChangeType::TIME:
-            event.showTime =1;
+            event.showTime = 1;
             break;
         default:
             break;
@@ -90,10 +90,10 @@ void UiController::UiTask()
                 /*static lv_style_t style_screen;
                 style_screen.body.main_color = LV_COLOR_BLACK;
                 lv_obj_set_style(lv_scr_act(), &style_screen);*/
-                /*Create a Label on the currently active screen*/
                 if (mTimeLabel == nullptr)
                 {
                     lv_obj_t *screen = lv_disp_get_scr_act(NULL); /* Get current screen */
+                    /*Create a Label on the currently active screen*/
                     mTimeLabel = lv_label_create(screen, NULL);
                     static lv_style_t style1;
                     lv_style_copy(&style1, &lv_style_plain);
