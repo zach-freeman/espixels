@@ -4,6 +4,7 @@
 #include "UiController.hpp"
 #include "Dispatcher.hpp"
 #include "esp_log.h"
+
 #include "lvgl/lvgl.h"
 #include "TaskBase.hpp"
 #include "TaskConfig.hpp"
@@ -101,19 +102,29 @@ void UiController::UiTask()
             }
             else if (event.showTime)
             {
-                lv_obj_clean(lv_scr_act());
-                lv_obj_t *screen = lv_disp_get_scr_act(NULL); /* Get current screen */
+                //lv_obj_clean(lv_scr_act());
+                //lv_obj_t *screen = lv_disp_get_scr_act(NULL); /* Get current screen */
+                /*static lv_style_t style_screen;
+                style_screen.body.main_color = LV_COLOR_BLACK;
+                lv_obj_set_style(lv_scr_act(), &style_screen);*/
                 /*Create a Label on the currently active screen*/
-                lv_obj_t *label1 = lv_label_create(screen, NULL);
-
+                if (mTimeLabel == nullptr)
+                {
+                    lv_obj_t *screen = lv_disp_get_scr_act(NULL); /* Get current screen */
+                    mTimeLabel = lv_label_create(screen, NULL);
+                    static lv_style_t style1;
+                    lv_style_copy(&style1, &lv_style_plain);
+                    style1.text.font = &lv_font_roboto_28;
+                    style1.text.color = LV_COLOR_BLACK;
+                    lv_label_set_style(mTimeLabel, LV_LABEL_STYLE_MAIN, &style1);
+                }
                 /*Modify the Label's text*/
                 std::string time = StoreProvider::GetInstance().GetTimeStore().GetTimeString();
-                lv_label_set_text(label1, time.c_str());
-
+                lv_label_set_text(mTimeLabel, time.c_str());
                 /* Align the Label to the center
                 * NULL means align on parent (which is the screen now)
                 * 0, 0 at the end means an x, y offset after alignment*/
-                lv_obj_align(label1, NULL, LV_ALIGN_CENTER, 0, 0); 
+                lv_obj_align(mTimeLabel, NULL, LV_ALIGN_CENTER, 0, 0);
             }
         }
         vTaskDelay(pdMS_TO_TICKS(10));

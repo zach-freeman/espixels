@@ -56,6 +56,7 @@ private:
     TaskHandle_t mUiTaskHandle{};
     Action::Source mActionSource;
     std::string mCurrentTimeString;
+    lv_obj_t *mTimeLabel{nullptr};
     //==========================================================================
     // Private method prototypes
     //==========================================================================
