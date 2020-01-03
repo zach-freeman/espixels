@@ -1,6 +1,8 @@
 [submodule "esp-idf"]
 	path = esp-idf
 	url = git@github.com:espressif/esp-idf.git
+	ignore = dirty
 [submodule "externals/lv_port_esp32_ili9341"]
 	path = externals/lv_port_esp32_ili9341
 	url = https://github.com/littlevgl/lv_port_esp32_ili9341.git
+	ignore = dirty
