@@ -41,7 +41,6 @@ private:
     typedef union {
         uint32_t rawBits;
             struct {
-                uint32_t helloWorld : 1;
                 uint32_t showTime : 1;
             };
     } Event_t;
