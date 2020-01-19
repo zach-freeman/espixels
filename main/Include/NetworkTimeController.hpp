@@ -51,7 +51,7 @@ private:
     // Private constants
     //==========================================================================
     static constexpr uint32_t SNTP_SYNC_STATUS_DELAY_MS{2000};
-    static constexpr uint32_t TIME_UPDATE_TIMER_MS{15000};
+    static constexpr uint32_t TIME_UPDATE_TIMER_MS{10000};
     static constexpr const char * TIME_FORMAT{"%I:%M %p"};
     //==========================================================================
     // Private data members
